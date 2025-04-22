@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:clima1_oop2/services/location.dart';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
