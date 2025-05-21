@@ -1,6 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:clima1_oop2/services/location.dart';
+import 'package:http/http.dart';
+
+import 'location_screen.dart';
+
+const apiKey = '8137ace68448d41da44e9bf9fd681a85';
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({Key? key}) : super(key: key);
@@ -10,18 +17,40 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
+  double? lat, long;
 
-void getLocation() async{
-  determinePosition();
-  Position position= await Geolocator.getCurrentPosition();
-  print(position);
-
-}
-@override
+  @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    getLocation();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      getLocationData();
+    });
+  }
+
+  Future<void> getLocationData() async {
+    
+    try {
+      Position position = await Geolocator.getCurrentPosition();
+      lat = position.latitude;
+      long = position.longitude;
+
+      final uri = Uri.parse(
+        'https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$long&appid=$apiKey',
+      );
+
+      Response response = await get(uri);
+
+      if (mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => LocationScreen(locationWeather: response.body),
+          ),
+        );
+      }
+    } catch (e) {
+      print('Error fetching location or weather data: $e');
+    }
   }
 
   @override
@@ -29,13 +58,11 @@ void getLocation() async{
     return Scaffold(
       body: Center(
         child: ElevatedButton(
-          onPressed: () {
-            //Get the current location
-            getLocation();
-          },
-          child: const Text('Get Location'),
+          onPressed: getLocationData,
+          child:  Text('Get Weather'),
         ),
       ),
     );
   }
 }
+
