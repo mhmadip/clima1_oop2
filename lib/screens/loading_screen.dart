@@ -59,7 +59,7 @@ class _LoadingScreenState extends State<LoadingScreen> {
       body: Center(
         child: ElevatedButton(
           onPressed: getLocationData,
-          child:  Text('Get Weather'),
+          child:  Text('Get weather'),
         ),
       ),
     );
